@@ -1,66 +1,75 @@
-import React from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import "./home.scss";
+import { generateRandomString } from "./random";
 import { setGlobalState, useGlobalState } from "./state";
-// import { CSVLink } from "csv";
-// import FinishDialog from "./FinishDialog";
-// var randomstring = require("randomstring");
-
+import { getReading } from "./loggerService";
+import { apiBaseUrl } from "./urls";
 const Home = () => {
   const [page] = useGlobalState("page");
   const [gsrSensorStatus] = useGlobalState("gsrSensorStatus");
   const [ecgSensorStatus] = useGlobalState("ecgSensorStatus");
   const [recordingStatus] = useGlobalState("recordingStatus");
-  // const [seconds, setSeconds] = useState(1);
-  // const [timerId, setTimerId] = useState(0);
-  // const [userId, setUserId] = useState(randomstring.generate(4).toUpperCase());
-  // const [filename, setFilename] = useState("");
-  // const [finishDialogVisible, setFinishDialogVisible] = useState(false);
+  const [seconds, setSeconds] = useState(1);
+  const [timerId, setTimerId] = useState(0);
+  const [filename, setFileName] = useState("na");
+  let count = 0;
   let loggingStartedTimeStamp = "";
   let loggingEndedTimeStamp = "";
+
+  useEffect(() => {
+    let interval = null;
+    let isActive = recordingStatus === "recording";
+    if (isActive) {
+      interval = setInterval(() => {
+        setSeconds((seconds) => seconds + 1);
+        let reading = getReading(seconds);
+        let ts = new Date().toISOString()
+        axios.post(apiBaseUrl+'/addRow', {reading, ts, filename}).then((snap)=>{
+          console.log('api response', snap.data);
+        })
+        console.log("filename: sensorReading", filename, reading);
+      }, 2000);
+    } else if (!isActive && seconds !== 0) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [recordingStatus, seconds]);
 
   const setPage = (page) => {
     setGlobalState("page", page);
   };
   const getFileName = (ts) => {
-    // return "../recordings/"+userId + "-" + ts + ".csv";
+    return ts + ".csv";
   };
 
   const startLogger = () => {
     if (recordingStatus === "new") {
       loggingStartedTimeStamp = new Date().toISOString();
-      // setFilename(getFileName(loggingStartedTimeStamp));
-    //   fs.writeFileSync(filename, "TimeStamp,SensorValue");
+      setFileName(getFileName(loggingStartedTimeStamp));
     }
     setGlobalState("recordingStatus", "recording");
-
-    let id = setInterval(() => {
-      let ts = new Date().toISOString();
-    //   fs.appendFileSync(filename, "\r\n" + ts + ",SensorValue");
-      console.log("ts", ts);
-    }, 2000);
-    // setTimerId(id);
+    console.log("filename", filename);
   };
   const pauseLogger = () => {
-    // clearInterval(timerId);
+    clearInterval(timerId);
     setGlobalState("recordingStatus", "paused");
   };
   const stopLogger = () => {
     setGlobalState("recordingStatus", "new");
     loggingEndedTimeStamp = new Date().toISOString();
-    // clearInterval(timerId);
-    // setSeconds(0);
-    // setFinishDialogVisible(true);
+    console.log("Saving data " + filename);
+    setSeconds(0);
   };
 
-  const handleUpload = () =>{
+  const handleUpload = () => {
     // console.log(filename+ ' Uploaded');
     // setFinishDialogVisible(false);
-  }
+  };
 
   return (
     <div className="home">
       <div className="homeContainer">
-        {/* <FinishDialog open={finishDialogVisible} handleCloseDialog={handleUpload}/> */}
         <h1>GSR Reasearch Project</h1>
         <h3>-By Bitopan Kalita</h3>
 
@@ -100,9 +109,10 @@ const Home = () => {
               <div className={`dot ${ecgSensorStatus}`} />
               <div className="text">ECG Sensor</div>
             </div>
+            <div className="count">{seconds}</div>
             <div className="buttonsContainer">
               <button
-                // onClick={startLogger}
+                onClick={() => startLogger()}
                 className="primary"
                 disabled={recordingStatus === "recording"}
               >
@@ -112,13 +122,13 @@ const Home = () => {
                 RECORDING
               </button>
               <button
-                // onClick={pauseLogger}
+                onClick={() => pauseLogger()}
                 disabled={!(recordingStatus === "recording")}
               >
                 PAUSE
               </button>
               <button
-                // onClick={stopLogger}
+                onClick={() => stopLogger()}
                 disabled={recordingStatus === "new"}
                 className="finish"
               >
@@ -129,7 +139,7 @@ const Home = () => {
               <button
                 className="primary"
                 onClick={(e) => {
-                  setPage(2);
+                  setPage(3);
                 }}
               >
                 NEXT
