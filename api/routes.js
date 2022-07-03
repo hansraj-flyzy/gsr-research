@@ -1,10 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const path = require("path");
 
 const { saveRowToFile } = require('./controller');
-const multer = require('multer')
-const upload = multer({ dest: './uploads/' })
 
 router.post("/addRow", saveRowToFile);
 router.use(express.static("build"));
