@@ -3,17 +3,19 @@ import React, { useEffect, useState } from "react";
 import "./home.scss";
 import { setGlobalState, useGlobalState } from "./state";
 import { getReading } from "./loggerService";
-import { apiBaseUrl, apiKey, clientId, folderId } from "./urls";
+import { apiBaseUrl, apiKey, appScriptUrl, clientId, folderId } from "./urls";
 
 const Home = () => {
   const [page] = useGlobalState("page");
   const [gsrSensorStatus] = useGlobalState("gsrSensorStatus");
   const [ecgSensorStatus] = useGlobalState("ecgSensorStatus");
   const [recordingStatus] = useGlobalState("recordingStatus");
+  const [subjectName, setSubjectName] = useState(
+    localStorage.getItem("subjectName") ?? ""
+  );
   const [seconds, setSeconds] = useState(1);
   const [timerId, setTimerId] = useState(0);
   const [filename, setFileName] = useState("na");
-  const [name, setName] = useState("N/A");
   let count = 0;
   let loggingStartedTimeStamp = "";
   let loggingEndedTimeStamp = "";
@@ -53,7 +55,7 @@ const Home = () => {
   const startLogger = () => {
     if (recordingStatus === "new") {
       loggingStartedTimeStamp = new Date().toISOString();
-      setFileName(getFileName(loggingStartedTimeStamp));
+      setFileName(subjectName+'_'+getFileName(loggingStartedTimeStamp));
     }
     setGlobalState("recordingStatus", "recording");
     console.log("filename", filename);
@@ -76,7 +78,24 @@ const Home = () => {
     <div className="home">
       <div className="homeContainer">
         <h1>GSR Reasearch Project</h1>
-        <h3>-By Bitopan Kalita</h3>
+
+        <div className="nameForm">
+          <h3>Subject name - </h3>
+          {page === 1 && (
+            <div>
+              <input
+                type="text"
+                onChange={(e) => {
+                  localStorage.setItem('subjectName', e.target.value)
+                  setSubjectName(e.target.value);
+                }}
+                value={subjectName}
+                placeholder="Full Name"
+              />
+            </div>
+          )}
+          {page !== 1 && <h3 className="margined">{subjectName}</h3>}
+        </div>
 
         {page === 1 && (
           <div className="page">
@@ -89,12 +108,11 @@ const Home = () => {
               <div className="text">ECG Sensor</div>
             </div>
             <div className="buttonsContainer">
-              <button className="primary">TEST SENSORS</button>
-              <button>TRIGGER SENSORS</button>
+              <button className="button primary">TEST SENSORS</button>
+              <button className="button">TRIGGER SENSORS</button>
             </div>
             <div className="bottomActionPanel">
-              <button
-                className="primary"
+              <button className="button primary"
                 onClick={(e) => {
                   setPage(2);
                 }}
@@ -116,9 +134,8 @@ const Home = () => {
             </div>
             <div className="count">{seconds}</div>
             <div className="buttonsContainer">
-              <button
+              <button className="button primary"
                 onClick={() => startLogger()}
-                className="primary"
                 disabled={recordingStatus === "recording"}
               >
                 {recordingStatus === "new" || recordingStatus === "recording"
@@ -126,35 +143,22 @@ const Home = () => {
                   : "RESUME"}{" "}
                 RECORDING
               </button>
-              <button
+              <button className="button"
                 onClick={() => pauseLogger()}
                 disabled={!(recordingStatus === "recording")}
               >
                 PAUSE
               </button>
-              <button
+              <button className="button finish"
                 onClick={() => stopLogger()}
                 disabled={recordingStatus === "new"}
-                className="finish"
               >
                 FINISH
               </button>
             </div>
             <div className="bottomActionPanel">
-              <button
-                className="primary"
-                onClick={(e) => {
-                  setPage(3);
-                }}
-              >
-                UPLOAD
-              </button>
+            <a className="button" style={{display: "table-cell"}} href={`${appScriptUrl}?name=${subjectName}`}>UPLOAD</a>
             </div>
-          </div>
-        )}
-        {page === 3 && (
-          <div>
-            Upload Form
           </div>
         )}
       </div>
