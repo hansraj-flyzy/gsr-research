@@ -9,6 +9,7 @@ app.use(cors({
 
 const api=require('./routes')
 app.use(api)
+
 app.listen(port, () => {
   console.log(`Started functions, listening at http://localhost:${port}`)
 })

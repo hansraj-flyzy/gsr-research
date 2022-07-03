@@ -1,11 +1,16 @@
 const express = require("express");
 const router = express.Router();
+const path = require("path");
 
-const {saveRowToFile} = require('./controller');
+const { saveRowToFile } = require('./controller');
+const multer = require('multer')
+const upload = multer({ dest: './uploads/' })
+
 router.post("/addRow", saveRowToFile);
-router.get("/", function (req, res) {
-    res.send('server running on port 8080')
- });
+router.use(express.static("build"));
+router.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "build", "index.html"));
+});
 
 
 module.exports = router;

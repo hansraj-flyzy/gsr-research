@@ -1,10 +1,10 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import "./home.scss";
-import { generateRandomString } from "./random";
 import { setGlobalState, useGlobalState } from "./state";
 import { getReading } from "./loggerService";
-import { apiBaseUrl } from "./urls";
+import { apiBaseUrl, apiKey, clientId, folderId } from "./urls";
+
 const Home = () => {
   const [page] = useGlobalState("page");
   const [gsrSensorStatus] = useGlobalState("gsrSensorStatus");
@@ -13,6 +13,7 @@ const Home = () => {
   const [seconds, setSeconds] = useState(1);
   const [timerId, setTimerId] = useState(0);
   const [filename, setFileName] = useState("na");
+  const [name, setName] = useState("N/A");
   let count = 0;
   let loggingStartedTimeStamp = "";
   let loggingEndedTimeStamp = "";
@@ -23,12 +24,18 @@ const Home = () => {
     if (isActive) {
       interval = setInterval(() => {
         setSeconds((seconds) => seconds + 1);
-        let reading = getReading(seconds);
-        let ts = new Date().toISOString()
-        axios.post(apiBaseUrl+'/addRow', {reading, ts, filename}).then((snap)=>{
-          console.log('api response', snap.data);
-        })
-        console.log("filename: sensorReading", filename, reading);
+        let sensorVal = getReading(seconds);
+        let timeStamp = new Date().toISOString();
+        axios
+          .post(apiBaseUrl + "/addRow", {
+            sensorVal,
+            timeStamp,
+            fileName: filename,
+          })
+          .then((snap) => {
+            console.log("api response", snap.data);
+          });
+        console.log("filename: sensorReading", filename, sensorVal);
       }, 2000);
     } else if (!isActive && seconds !== 0) {
       clearInterval(interval);
@@ -61,10 +68,8 @@ const Home = () => {
     console.log("Saving data " + filename);
     setSeconds(0);
   };
-
   const handleUpload = () => {
-    // console.log(filename+ ' Uploaded');
-    // setFinishDialogVisible(false);
+    console.log("Form Handle Upload called.");
   };
 
   return (
@@ -142,9 +147,14 @@ const Home = () => {
                   setPage(3);
                 }}
               >
-                NEXT
+                UPLOAD
               </button>
             </div>
+          </div>
+        )}
+        {page === 3 && (
+          <div>
+            Upload Form
           </div>
         )}
       </div>
