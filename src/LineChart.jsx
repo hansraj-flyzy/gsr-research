@@ -8,6 +8,7 @@ import {
   LineElement,
   Legend,
   Tooltip,
+  registerables
 } from "chart.js";
 import {
   Chart,
@@ -24,8 +25,10 @@ ChartJS.register(
   PointElement,
   LineElement,
   Legend,
-  Tooltip
+  Tooltip,
+  ...registerables
 );
+
 
 export const options = {
   scales: {
