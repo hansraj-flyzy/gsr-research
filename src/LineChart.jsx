@@ -9,8 +9,9 @@ import {
   Legend,
   Tooltip,
 } from "chart.js";
+import Chart from 'chart.js/auto';
+
 import {
-  Chart,
   getDatasetAtEvent,
   getElementAtEvent,
   getElementsAtEvent,
