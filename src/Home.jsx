@@ -4,6 +4,7 @@ import "./home.scss";
 import { setGlobalState, useGlobalState } from "./state";
 import { getReading } from "./loggerService";
 import { apiBaseUrl, apiKey, appScriptUrl, clientId, folderId } from "./urls";
+import LineChart from "./LineChart";
 
 const Home = () => {
   const [page] = useGlobalState("page");
@@ -55,7 +56,7 @@ const Home = () => {
   const startLogger = () => {
     if (recordingStatus === "new") {
       loggingStartedTimeStamp = new Date().toISOString();
-      setFileName(subjectName+'_'+getFileName(loggingStartedTimeStamp));
+      setFileName(subjectName + "_" + getFileName(loggingStartedTimeStamp));
     }
     setGlobalState("recordingStatus", "recording");
     console.log("filename", filename);
@@ -86,7 +87,7 @@ const Home = () => {
               <input
                 type="text"
                 onChange={(e) => {
-                  localStorage.setItem('subjectName', e.target.value)
+                  localStorage.setItem("subjectName", e.target.value);
                   setSubjectName(e.target.value);
                 }}
                 value={subjectName}
@@ -107,12 +108,16 @@ const Home = () => {
               <div className={`dot ${ecgSensorStatus}`} />
               <div className="text">ECG Sensor</div>
             </div>
+            <div className="chart">
+              <LineChart />
+            </div>
             <div className="buttonsContainer">
               <button className="button primary">TEST SENSORS</button>
               <button className="button">TRIGGER SENSORS</button>
             </div>
             <div className="bottomActionPanel">
-              <button className="button primary"
+              <button
+                className="button primary"
                 onClick={(e) => {
                   setPage(2);
                 }}
@@ -132,9 +137,9 @@ const Home = () => {
               <div className={`dot ${ecgSensorStatus}`} />
               <div className="text">ECG Sensor</div>
             </div>
-            <div className="count">{seconds}</div>
             <div className="buttonsContainer">
-              <button className="button primary"
+              <button
+                className="button primary"
                 onClick={() => startLogger()}
                 disabled={recordingStatus === "recording"}
               >
@@ -143,13 +148,15 @@ const Home = () => {
                   : "RESUME"}{" "}
                 RECORDING
               </button>
-              <button className="button"
+              <button
+                className="button"
                 onClick={() => pauseLogger()}
                 disabled={!(recordingStatus === "recording")}
               >
                 PAUSE
               </button>
-              <button className="button finish"
+              <button
+                className="button finish"
                 onClick={() => stopLogger()}
                 disabled={recordingStatus === "new"}
               >
@@ -157,7 +164,21 @@ const Home = () => {
               </button>
             </div>
             <div className="bottomActionPanel">
-            <a className="button" style={{display: "table-cell"}} href={`${appScriptUrl}?name=${subjectName}`}>UPLOAD</a>
+              <button
+                onClick={(e) => {
+                  setPage(1);
+                }}
+                className="button"
+              >
+                BACK
+              </button>
+              <a
+                className="button"
+                style={{ display: "table-cell" }}
+                href={`${appScriptUrl}?name=${subjectName}`}
+              >
+                UPLOAD
+              </a>
             </div>
           </div>
         )}
