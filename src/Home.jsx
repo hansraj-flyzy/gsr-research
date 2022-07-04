@@ -17,10 +17,11 @@ const Home = () => {
   const [seconds, setSeconds] = useState(1);
   const [timerId, setTimerId] = useState(0);
   const [filename, setFileName] = useState("na");
+  const [last10Recordings, setLast10Recordings] = useState([]);
+  const [last10TimeStamps, setLast10TimeStamps] = useState([]);
   let count = 0;
   let loggingStartedTimeStamp = "";
   let loggingEndedTimeStamp = "";
-
   useEffect(() => {
     let interval = null;
     let isActive = recordingStatus === "recording";
@@ -36,9 +37,24 @@ const Home = () => {
             fileName: filename,
           })
           .then((snap) => {
-            console.log("api response", snap.data);
+            const arr = snap.data.last10Lines
+              .replace(/\r\n/g, "\n")
+              .split("\n");
+            let tss = []
+            let rcds = []
+            arr.map((r, i) => {
+              if (r !== "") {
+                // console.log("arrayRow", r);
+                let values = r.split(',')
+                let time = new Date(values[0]).toLocaleTimeString()
+                tss.push(time)
+                rcds.push(values[1])
+              }
+            });
+            setLast10TimeStamps(tss);
+            setLast10Recordings(rcds);
           });
-        console.log("filename: sensorReading", filename, sensorVal);
+        // console.log("filename: sensorReading", filename, sensorVal);
       }, 2000);
     } else if (!isActive && seconds !== 0) {
       clearInterval(interval);
@@ -59,7 +75,7 @@ const Home = () => {
       setFileName(subjectName + "_" + getFileName(loggingStartedTimeStamp));
     }
     setGlobalState("recordingStatus", "recording");
-    console.log("filename", filename);
+    // console.log("filename", filename);
   };
   const pauseLogger = () => {
     clearInterval(timerId);
@@ -68,11 +84,11 @@ const Home = () => {
   const stopLogger = () => {
     setGlobalState("recordingStatus", "new");
     loggingEndedTimeStamp = new Date().toISOString();
-    console.log("Saving data " + filename);
+    // console.log("Saving data " + filename);
     setSeconds(0);
   };
   const handleUpload = () => {
-    console.log("Form Handle Upload called.");
+    // console.log("Form Handle Upload called.");
   };
 
   return (
@@ -107,9 +123,6 @@ const Home = () => {
             <div className="statusDots">
               <div className={`dot ${ecgSensorStatus}`} />
               <div className="text">ECG Sensor</div>
-            </div>
-            <div className="chart">
-              <LineChart />
             </div>
             <div className="buttonsContainer">
               <button className="button primary">TEST SENSORS</button>
@@ -162,6 +175,12 @@ const Home = () => {
               >
                 FINISH
               </button>
+            </div>
+            <div className="chart">
+              <LineChart
+                labels={last10TimeStamps}
+                chartData={last10Recordings}
+              />
             </div>
             <div className="bottomActionPanel">
               <button
