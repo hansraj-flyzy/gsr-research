@@ -97,7 +97,7 @@ const LineChart = ({labels, chartData}) => {
       onClick={onClick}
       options={options}
       data={data}
-      height="60px"
+      height="140px"
     />
   );
 };

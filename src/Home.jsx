@@ -37,7 +37,7 @@ const Home = () => {
             fileName: filename,
           })
           .then((snap) => {
-            const arr = snap.data.last10Lines
+            const arr = snap.data.last50Lines
               .replace(/\r\n/g, "\n")
               .split("\n");
             let tss = []

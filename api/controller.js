@@ -11,10 +11,10 @@ exports.saveRowToFile = async (req, res) => {
         // console.log('saveRowToFile called.', req.body);
         fs.appendFileSync('recordings/' + fileName, `${timeStamp},${sensorVal}\r\n`)
         const readLastLines = require('read-last-lines');
-        readLastLines.read('recordings/' + fileName, 10)
+        readLastLines.read('recordings/' + fileName, 50)
             .then((lines) => {
                 // console.log('lines', lines);
-                res.send({ success: true, last10Lines: lines });
+                res.send({ success: true, last50Lines: lines });
             })
     } catch (error) {
         res.send({ success: false, error: error.message })
