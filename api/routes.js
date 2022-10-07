@@ -52,7 +52,7 @@ router.post("/addRow", (req, res, next) => {
     }, 100)
 });
 
-const { checkForUpdates } = require('./controller');
+const { checkForUpdates, connectToWifi } = require('./controller');
 
 
 router.use(express.static("build"));
@@ -72,6 +72,8 @@ router.get("/testSensor", (req, res) => {
     }, 200)
 });
 router.post('/checkForUpdates', checkForUpdates)
+
+router.post('/connect', connectToWifi)
 
 
 module.exports = router;

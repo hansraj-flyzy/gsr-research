@@ -12,6 +12,7 @@
     "cors": "^2.8.5",
     "express": "^4.18.1",
     "faker": "^6.6.6",
+    "node-wifi": "^2.0.16",
     "nodemon": "^2.0.18",
     "randomstring": "^1.2.2",
     "react": "^18.2.0",
