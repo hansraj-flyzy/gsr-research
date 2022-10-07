@@ -133,9 +133,14 @@
                 .value{
 
                 }
+                .latest{
+                    font-weight: bold;
+                    color: rgb(122, 43, 226);
+
+                }
                 .divider{
                     height: 20px;
-                    width: 3px;
+                    width: 1px;
                     background-color: lightblue;
                 }
             }

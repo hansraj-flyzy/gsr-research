@@ -220,8 +220,8 @@ const Home = () => {
               </button>
             </div>
             <div className="printValues">
-            {last10Recordings.map(v=>{
-              return (<><div className="val">{v}</div><div className="divider"></div></>)
+            {last10Recordings.map((v, i)=>{
+              return (<><div className={`val ${i===last10Recordings.length-1?'latest':''}`}>{v}</div><div className="divider"></div></>)
             })}
             </div>
             <div className="chart">
