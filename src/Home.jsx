@@ -221,7 +221,7 @@ const Home = () => {
             </div>
             <div className="printValues">
             {last10Recordings.map(v=>{
-              return <div className="val">{v}</div>
+              return (<><div className="val">{v}</div><div className="divider"></div></>)
             })}
             </div>
             <div className="chart">
