@@ -182,7 +182,12 @@ const Home = () => {
           <div className="page">
             <div className="statusDots">
               <div className={`dot ${gsrSensorStatus}`} />
-              <div className="text">Galvanic Sensor</div>
+              <div>
+                <div className="text">Galvanic Sensor</div>
+                <div >
+                Last OK on {sensorLastOk.toLocaleString()}
+                </div>
+              </div>
             </div>
             <div className="statusDots">
               <div className={`dot ${ecgSensorStatus}`} />
@@ -213,6 +218,11 @@ const Home = () => {
               >
                 FINISH
               </button>
+            </div>
+            <div className="printValues">
+            {last10Recordings.map(v=>{
+              return <div className="val">{v}</div>
+            })}
             </div>
             <div className="chart">
               <LineChart

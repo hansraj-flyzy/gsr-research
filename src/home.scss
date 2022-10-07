@@ -125,6 +125,11 @@
                 }
             }
 
+            .printValues{
+                display: flex;
+                justify-content: space-between;
+            }
+
             .bottomActionPanel{
                 display: flex;
                 align-items: flex-end;
