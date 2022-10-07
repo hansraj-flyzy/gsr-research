@@ -1,27 +1,5 @@
 const { default: axios } = require('axios');
 const fs = require('fs');
-const { folderId } = require('../src/urls');
-
-exports.saveRowToFile = async (req, res) => {
-    try {
-
-        let fileName = req.body.fileName;
-        let sensorVal = req.body.sensorVal;
-        let timeStamp = req.body.timeStamp;
-        // console.log('saveRowToFile called.', req.body);
-        fs.appendFileSync('recordings/' + fileName, `${timeStamp},${sensorVal}\r\n`)
-        const readLastLines = require('read-last-lines');
-        readLastLines.read('recordings/' + fileName, 50)
-            .then((lines) => {
-                // console.log('lines', lines);
-                res.send({ success: true, last50Lines: lines });
-            })
-    } catch (error) {
-        res.send({ success: false, error: error.message })
-        console.error(error);
-    }
-}
-
 exports.checkForUpdates = async (req, res) => {
     try {
         let resp = await axios.get('https://us-central1-tusc-91a8b.cloudfunctions.net/gsr/getProdVersion')

@@ -11,6 +11,7 @@ const Home = () => {
   const [gsrSensorStatus] = useGlobalState("gsrSensorStatus");
   const [ecgSensorStatus] = useGlobalState("ecgSensorStatus");
   const [recordingStatus] = useGlobalState("recordingStatus");
+  const [sensorLastOk, setSensorLastOk] = useState(new Date(2000,1,1));
   const [subjectName, setSubjectName] = useState(
     localStorage.getItem("subjectName") ?? ""
   );
@@ -40,15 +41,15 @@ const Home = () => {
             const arr = snap.data.last50Lines
               .replace(/\r\n/g, "\n")
               .split("\n");
-            let tss = []
-            let rcds = []
+            let tss = [];
+            let rcds = [];
             arr.map((r, i) => {
               if (r !== "") {
                 // console.log("arrayRow", r);
-                let values = r.split(',')
-                let time = new Date(values[0]).toLocaleTimeString()
-                tss.push(time)
-                rcds.push(values[1])
+                let values = r.split(",");
+                let time = new Date(values[0]).toLocaleTimeString();
+                tss.push(time);
+                rcds.push(values[1]);
               }
             });
             setLast10TimeStamps(tss);
@@ -61,6 +62,31 @@ const Home = () => {
     }
     return () => clearInterval(interval);
   }, [recordingStatus, seconds]);
+
+  useEffect(() => {
+    testSensor();
+  }, []);
+
+  const testSensor = () => {
+    axios.get(apiBaseUrl + "/testSensor").then((resp) => {
+      console.log('resp', resp.data);
+      let oldDate=new Date(2000, 1, 1);
+      if(resp.data.sensorLastOk){
+        oldDate = new Date(resp.data.sensorLastOk);
+      }
+      console.log('old Date', oldDate);
+      let newDate = new Date();
+      console.log('new Date', newDate);
+      let diff = (newDate.getTime() - oldDate.getTime())/1000;
+      console.log('diff', diff);
+      setSensorLastOk(new Date(resp.data.sensorLastOk));
+      if (diff < 20) {
+        setGlobalState("gsrSensorStatus", "green");
+      } else{
+        setGlobalState("gsrSensorStatus", "red");
+      }
+    });
+  };
 
   const setPage = (page) => {
     setGlobalState("page", page);
@@ -118,14 +144,26 @@ const Home = () => {
           <div className="page">
             <div className="statusDots">
               <div className={`dot ${gsrSensorStatus}`} />
-              <div className="text">Galvanic Sensor</div>
+              <div>
+                <div className="text">Galvanic Sensor</div>
+                <div >
+                Last OK on {sensorLastOk.toLocaleString()}
+                </div>
+              </div>
             </div>
             <div className="statusDots">
               <div className={`dot ${ecgSensorStatus}`} />
               <div className="text">ECG Sensor</div>
             </div>
             <div className="buttonsContainer">
-              <button className="button primary">TEST SENSORS</button>
+              <button
+                onClick={() => {
+                  testSensor();
+                }}
+                className="button primary"
+              >
+                TEST SENSORS
+              </button>
               <button className="button">TRIGGER SENSORS</button>
             </div>
             <div className="bottomActionPanel">
